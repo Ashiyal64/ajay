@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 from io import BytesIO
@@ -91,6 +92,7 @@ if selected == "Image":
 
         rec_cols = st.columns(3)
         for idx, col in zip(similar_indices, rec_cols):
+            new_width, new_height=200,300
             with col:
                 url = df["image_url"][idx]
                 caption = df["name"][idx]
