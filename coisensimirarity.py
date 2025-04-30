@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from io import BytesIO
@@ -80,7 +79,31 @@ if selected == "Image":
 
     else:
         clicked_index = st.session_state.shown
-        st.subheader(f"🔍 Similar Products to: *{df['name'][clicked_index]}*")
+        st.subheader(f"🖼️ You clicked on: *{df['name'][clicked_index]}*")
+
+        # Show clicked product image and details
+        clicked_col = st.columns([1, 2])
+        with clicked_col[0]:
+            try:
+                url = df["image_url"][clicked_index]
+                resp = requests.get(url, timeout=5)
+                if resp.status_code == 200:
+                    img = Image.open(BytesIO(resp.content))
+                    img = img.resize((250, 250), resample=Image.LANCZOS)
+                    st.image(img, use_container_width=False)
+                else:
+                    placeholder = f"https://via.placeholder.com/250x250?text=No+Image"
+                    st.image(placeholder, use_container_width=False)
+            except:
+                st.image("https://via.placeholder.com/250x250?text=Image+Error", use_container_width=False)
+
+        with clicked_col[1]:
+            st.markdown(f"<div class='caption-text'><strong>Name:</strong> {df['name'][clicked_index]}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='caption-text'><strong>Description:</strong> {df['Description'][clicked_index]}</div>", unsafe_allow_html=True)
+            st.markdown(f"<div class='caption-text'><strong>Category:</strong> {df['Category'][clicked_index]}</div>", unsafe_allow_html=True)
+
+        st.markdown("---")
+        st.subheader("🧠 Similar Products")
 
         # TF-IDF similarity
         vectorizer = TfidfVectorizer(stop_words='english')
@@ -92,7 +115,7 @@ if selected == "Image":
 
         rec_cols = st.columns(3)
         for idx, col in zip(similar_indices, rec_cols):
-            new_width, new_height=200,300
+            new_width, new_height = 200, 300
             with col:
                 url = df["image_url"][idx]
                 caption = df["name"][idx]
